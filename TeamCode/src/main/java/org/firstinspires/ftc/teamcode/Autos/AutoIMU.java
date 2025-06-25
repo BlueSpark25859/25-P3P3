@@ -39,11 +39,13 @@ public class AutoIMU extends LinearOpMode {
 
         waitForStart();
 
+        avanzarRecto(0.3,50);
+
         while(opModeIsActive()){
             //Dar un giro preciso
-            giroAngulo(270);
+            //giroAngulo(270);
             //Ir a 0.4 de potencia para recorrer 100 cm
-            //avanzarRecto(0.4,100);
+            //avanzarRecto(0.3,10);
 
             telemetry.addData("Heading: ", obtenerAngulo());
             telemetry.addData("Error: ", obtenerError(190));
@@ -104,10 +106,10 @@ public class AutoIMU extends LinearOpMode {
     //Función para avanzar recto
     public void avanzarRecto(double poder, double distanciaCM){
         double targetAngle = obtenerAngulo();
-        double kp = 0.03;
+        double kp = 0.015;
         // Calcular ticks necesarios (ajusta según tus motores y ruedas)
-        double ticksPorVuelta = 560;
-        double diametroRuedaCM = 10.0;
+        double ticksPorVuelta = 280;
+        double diametroRuedaCM = 9.2;
         double ticksPorCM = ticksPorVuelta / (Math.PI * diametroRuedaCM);
         int ticksObjetivo = (int)(distanciaCM * ticksPorCM);
 
