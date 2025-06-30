@@ -20,7 +20,8 @@ public class AutoIMU extends LinearOpMode {
         //Creación de motores e IMU
         leftDrive = hardwareMap.get(DcMotor.class, "left_drive");
         rightDrive = hardwareMap.get(DcMotor.class, "right_drive");
-        leftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
         imu = hardwareMap.get(IMU.class, "imu");
 
         //Configuración para que los motores funcionen con encoder
@@ -35,21 +36,23 @@ public class AutoIMU extends LinearOpMode {
                         RevHubOrientationOnRobot.UsbFacingDirection.FORWARD))
         );
 
-
-
         waitForStart();
 
-        avanzarRecto(0.3,50);
-
         while(opModeIsActive()){
-            //Dar un giro preciso
-            //giroAngulo(270);
-            //Ir a 0.4 de potencia para recorrer 100 cm
-            //avanzarRecto(0.3,10);
-
-            telemetry.addData("Heading: ", obtenerAngulo());
-            telemetry.addData("Error: ", obtenerError(190));
-            telemetry.update();
+            avanzarRecto(0.7,100);
+            sleep(3000);
+            giroAngulo(270);
+            sleep(3000);
+            avanzarRecto(0.7,100);
+            sleep(3000);
+            giroAngulo(0);
+            sleep(3000);
+            avanzarRecto(0.7,100);
+            sleep(3000);
+            giroAngulo(90);
+            avanzarRecto(0.7,100);
+            sleep(3000);
+            break;
         }
     }
 
@@ -59,7 +62,7 @@ public class AutoIMU extends LinearOpMode {
     public void giroAngulo(double angulo){
         double kp = 0.015;       // Ganancia proporcional (ajustable)
         double minPower = 0.12;  // Potencia mínima para vencer fricción estática
-        double tolerancia = 1.5; // Error aceptable en grados
+        double tolerancia = 0.5; // Error aceptable en grados
 
         while (opModeIsActive()) {
             double error = obtenerError(angulo);
@@ -76,8 +79,8 @@ public class AutoIMU extends LinearOpMode {
             }
 
             // Aplicar giro
-            leftDrive.setPower(-power);
-            rightDrive.setPower(power);
+            leftDrive.setPower(power);
+            rightDrive.setPower(-power);
 
             telemetry.addData("Ángulo actual", obtenerAngulo());
             telemetry.addData("Error", error);
@@ -110,7 +113,7 @@ public class AutoIMU extends LinearOpMode {
         // Calcular ticks necesarios (ajusta según tus motores y ruedas)
         double ticksPorVuelta = 280;
         double diametroRuedaCM = 9.2;
-        double ticksPorCM = ticksPorVuelta / (Math.PI * diametroRuedaCM);
+        double ticksPorCM = ticksPorVuelta / (Math.PI * diametroRuedaCM); //28.88
         int ticksObjetivo = (int)(distanciaCM * ticksPorCM);
 
         // Resetear encoders y configurar modo
@@ -130,11 +133,12 @@ public class AutoIMU extends LinearOpMode {
             correction = Math.max(Math.min(correction, 0.3), -0.3);
 
             // Aplicar corrección (izquierda o derecha)
-            leftDrive.setPower(poder - correction);
-            rightDrive.setPower(poder + correction);
+            leftDrive.setPower(poder + correction);
+            rightDrive.setPower(poder - correction);
 
             telemetry.addData("Error", error);
             telemetry.addData("Corrección", correction);
+            telemetry.addData("Heading: ", obtenerAngulo());
             telemetry.addData("L", leftDrive.getCurrentPosition());
             telemetry.addData("R", rightDrive.getCurrentPosition());
             telemetry.update();
